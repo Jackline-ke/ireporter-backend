@@ -1,3 +1,8 @@
+# app/models/user.rb
+
 class User < ApplicationRecord
-    has_many :posts
-end
+    has_many :posts       
+
+   
+  end
+  

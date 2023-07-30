@@ -1,3 +1,6 @@
+# app/models/category.rb
+
 class Category < ApplicationRecord
-    has_many : posts
-end
+    has_many :posts
+  end
+  

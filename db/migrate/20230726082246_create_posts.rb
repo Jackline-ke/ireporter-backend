@@ -9,9 +9,6 @@ class CreatePosts < ActiveRecord::Migration[7.0]
 
       t.timestamps
     end
-    
-    add_foreign_key :posts, :users, column: :user_id
-    add_foreign_key :posts, :flags, column: :flag_id
-    add_foreign_key :posts, :locations, column: :location_id
+   
   end
 end
