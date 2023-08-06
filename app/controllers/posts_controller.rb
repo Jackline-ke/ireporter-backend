@@ -1,58 +1,73 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_post, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_user!, only: [:edit, :update, :destroy]
+  # GET /posts
   def index
     @posts = Post.all
-    render json: @posts
+    render json: @posts, status: :ok
   end
 
+  # GET /posts/{id}
   def show
-    @post = Post.find(params[:id])
-    render json: @post
-  end
-  def new
-    @post = current_user.posts.build
+    @post = Post.find_by(id: params[:id])
+    if @post
+      render json: @post, status: :ok
+    else
+      render json: { error: "Post not found" }, status: :not_found
+    end
   end
 
+  # POST /posts
   def create
+    if current_user.nil?
+      render json: { error: "You must be logged in to add a new post" }, status: :unauthorized
+      return
+    end
+
     @post = current_user.posts.build(post_params)
     if @post.save
-      redirect_to @post, notice: "Post was successfully created."
+      render json: @post, status: :created
     else
-      render :new
+      render json: { errors: @post.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  def edit
+ # GET /posts/{id}/edit
+ def edit
+  @post = Post.find_by(id: params[:id])
+  if @post
+    render json: @post, status: :ok
+  else
+    render json: { error: "Post not found" }, status: :not_found
   end
+end
 
-  def update
+# PATCH /posts/{id}
+def update
+  @post = Post.find_by(id: params[:id])
+  if @post
     if @post.update(post_params)
-      redirect_to @post, notice: "Post was successfully updated."
+      render json: @post, status: :ok
     else
-      render :edit
+      render json: { errors: @post.errors.full_messages }, status: :unprocessable_entity
     end
+  else
+    render json: { error: "Post not found" }, status: :not_found
   end
+end
 
-  def destroy
-    @post.destroy
-    redirect_to posts_path, notice: "Post was successfully deleted."
+# DELETE /posts/{id}
+def destroy
+  @post = Post.find_by(id: params[:id])
+  if @post
+    @post.update(deleted_at: Time.now)
+    head :no_content
+  else
+    render json: { error: "Post not found" }, status: :not_found
   end
+end
 
-  private
+private
 
-  def post_params
-    params.require(:post).permit(:title, :body, :latitude, :longitude, :image, :video, :flag_id, :location_id, :category_id)
-  end
-
-  def set_post
-    @post = Post.find(params[:id])
-  end
-
-  def authorize_user!
-    if current_user != @post.user
-      redirect_to @post, alert: "You are not authorized to perform this action."
-    end
-  end
+def post_params
+  params.require(:post).permit(:title, :body)
+end
 end

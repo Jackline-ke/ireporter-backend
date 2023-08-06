@@ -7,8 +7,9 @@ Rails.application.routes.draw do
 
   # Routes for Categories
   resources :categories, only: [:index, :show]
-  resources :posts, only: [:index, :show, :new, :create, :edit, :update, :destroy]
 
+
+  resources :posts, only: [:index, :show, :new, :create, :edit, :update, :destroy]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   resources :categories, only: [:index, :show]
   # Defines the root path route ("/")
